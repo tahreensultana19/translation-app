@@ -64,6 +64,6 @@ app.post('/api/translations', async (req, res) => {
 });
 
 // Start the server
-app.listen(port,'0.0.0.0', () => {
-  console.log(`Server is running on http://0.0.0.0:${port}`);
+app.listen(port,'127.0.0.1', () => {
+  console.log(`Server is running on http://127.0.0.1:${port}`);
 });

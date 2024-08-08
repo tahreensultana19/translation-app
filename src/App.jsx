@@ -43,7 +43,7 @@ const App = () => {
       setIsLoading(false);
   
       // Send translation result to the backend
-      await fetch('http://localhost:5000/api/save-translation', { 
+      await fetch('http://localhost:3000/api/save-translation', { 
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
