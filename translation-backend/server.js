@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
@@ -12,10 +12,10 @@ app.use(bodyParser.json());
 
 // Database connection
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "db",
-  password: "123456",
+  user: "db_hssz_user",
+  host: "dpg-cqqhmaggph6c738bv33g-a",
+  database: "db_hssz",
+  password: "AB47q4LOYCAM9R8JKQxBwq0uqaFVh1KJ",
   port: 5432,
 });
 
