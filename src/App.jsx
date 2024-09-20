@@ -245,8 +245,8 @@ const App = () => {
         {isLoading ? <BeatLoader size={12} color={"red"} /> : translation}
       </div>
 
-      <div className="language-stats">
-        <h2>Language Stats</h2>
+      {/* <div className="language-stats">
+        <h2>Language Stas</h2>
         <ul>
           {Object.entries(languageStats).map(([language, count]) => (
             <li key={language}>
@@ -254,7 +254,7 @@ const App = () => {
             </li>
           ))}
         </ul>
-      </div>
+      </div> */}
 
 
       <div className={`notification ${showNotification ? "active" : ""}`}>
