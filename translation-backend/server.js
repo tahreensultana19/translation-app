@@ -184,10 +184,10 @@ app.use(bodyParser.json());
 
 // Database connection
 const pool = new Pool({
-  user: "db_hssz_user",
-  host: "dpg-cqqhmaggph6c738bv33g-a",
-  database: "db_hssz",
-  password: "AB47q4LOYCAM9R8JKQxBwq0uqaFVh1KJ",
+  user: "translation_app_z0qh_user",
+  host: "dpg-cro3r3u8ii6s73f2fsgg-a",
+  database: "translation_app_z0qh",
+  password: "djGa9PBrauKPvNu0wA6rpHBTuhkY5VUr",
   port: 5432,
 });
 
