@@ -17,6 +17,11 @@ const pool = new Pool({
   database: "translation_app_z0qh",
   password: "djGa9PBrauKPvNu0wA6rpHBTuhkY5VUr",
   port: 5432,
+  idleTimeoutMillis: 30000,  // close idle clients after 30 seconds
+  connectionTimeoutMillis: 5000,  // wait for a maximum of 5 seconds for a connection
+  ssl: {
+    rejectUnauthorized: false // Allows self-signed certificates
+  },
 });
 module.exports = pool;
 
