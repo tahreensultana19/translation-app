@@ -58,8 +58,16 @@ app.get("/api/translations", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
+app.post("/compareTranslate", (req, res) => {
+  const { message, sourceLanguage, destinationLanguage, temperatureValue, selectedModels } = req.body;
+  
+  // Add your translation logic here
+  // For now, we're just returning a dummy response
+  res.json({ translation: "Translation result here" });
+});
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
+
+
