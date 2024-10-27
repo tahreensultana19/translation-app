@@ -1,9 +1,12 @@
 // import React, { useState } from "react";
 // import { Link } from "react-router-dom";
 // import { createClient } from "@supabase/supabase-js";
+// import { Configuration, OpenAIApi } from "openai";
+// import { GoogleGenerativeAI } from "@google/generative-ai";
+// import { BeatLoader } from "react-spinners";
 
-// const supabaseUrl = import.meta.env.VITE_SUPABASE_URL; 
-// const supabaseKey = import.meta.env.VITE_SUPABASE_KEY; 
+// const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+// const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
 // const supabase = createClient(supabaseUrl, supabaseKey);
 
 // const CompareTranslate = () => {
@@ -17,6 +20,36 @@
 //   const [scores, setScores] = useState({});
 //   const [error, setError] = useState("");
 //   const [isLoading, setIsLoading] = useState(false);
+
+//   const googleGenAI = new GoogleGenerativeAI(import.meta.env.VITE_GOOGLE_API_KEY);
+//   const configuration = new Configuration({
+//     apiKey: import.meta.env.VITE_OPENAI_KEY,
+//   });
+//   const openai = new OpenAIApi(configuration);
+
+//   const deepLLanguageCodes = {
+//     "Spanish": "ES",
+//     "French": "FR",
+//     "German": "DE",
+//     "Italian": "IT",
+//     "Dutch": "NL",
+//     "Russian": "RU",
+//     "Chinese (Simplified)": "ZH",
+//     "Japanese": "JA",
+//     "Portuguese": "PT",
+//     "Polish": "PL",
+//     "Swedish": "SV",
+//     "Arabic": "AR",
+//     "Turkish": "TR",
+//     "Korean": "KO",
+//     "Hindi": "HI",
+//     "Greek": "EL",
+//     "Hebrew": "HE",
+//     "Thai": "TH",
+//     "Vietnamese": "VI",
+//     "Indonesian": "ID",
+//     "Malay": "MS",
+//   };
 
 //   const handleInputChange = (e) => {
 //     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -34,14 +67,70 @@
 //     });
 //   };
 
+//   const translateWithDeepL = async (text, toLang) => {
+//     try {
+//       const targetLangCode = deepLLanguageCodes[toLang];
+//       if (!targetLangCode) {
+//         throw new Error(`Unsupported language: ${toLang}`);
+//       }
+
+//       const response = await fetch(`https://api-free.deepl.com/v2/translate`, {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/x-www-form-urlencoded",
+//         },
+//         body: new URLSearchParams({
+//           auth_key: import.meta.env.VITE_DEEPL_API_KEY,
+//           text: text,
+//           source_lang: "EN",
+//           target_lang: targetLangCode,
+//         }),
+//       });
+
+//       if (!response.ok) {
+//         throw new Error(`DeepL API request failed with status ${response.status}`);
+//       }
+
+//       const data = await response.json();
+//       return data.translations[0].text;
+//     } catch (error) {
+//       console.error("DeepL Translation Error:", error);
+//       throw new Error("Failed to translate with DeepL. Please check the API key, language codes, or try again later.");
+//     }
+//   };
+
 //   const translate = async (model) => {
-//     // console.log("Translating with model:", model, "Message:", formData.message); // Log input
-//     // Mock translation logic with tone consideration
-//     return new Promise((resolve) => {
-//       setTimeout(() => {
-//         resolve(`${model} (${formData.tone} tone): ${formData.message} to ${formData.toLanguage}`);
-//       }, 1000);
-//     });
+//     const { toLanguage, message, tone } = formData;
+//     setIsLoading(true);
+//     let translatedText = "";
+
+//     try {
+//       if (model.startsWith("gpt")) {
+//         const response = await openai.createChatCompletion({
+//           model: model,
+//           messages: [
+//             { role: "system", content: `Translate this sentence into ${toLanguage}.` },
+//             { role: "user", content: message },
+//           ],
+//           max_tokens: 100,
+//         });
+//         translatedText = response.data.choices[0].message.content.trim();
+//       } else if (model.startsWith("gemini")) {
+//         const genAIModel = googleGenAI.getGenerativeModel({ model });
+//         const prompt = `Translate the text: "${message}" from English to ${toLanguage} with a ${tone.toLowerCase()} tone.`;
+//         const result = await genAIModel.generateContent(prompt);
+//         translatedText = await result.response.text();
+//       } else if (model === "deepl") {
+//         translatedText = await translateWithDeepL(message, toLanguage);
+//       }
+
+//       return translatedText;
+//     } catch (error) {
+//       console.error("Translation Error:", error);
+//       setError("Translation failed. Please try again.");
+//     } finally {
+//       setIsLoading(false);
+//     }
 //   };
 
 //   const handleOnSubmit = async (e) => {
@@ -123,7 +212,6 @@
 //           </select>
 //         </div>
 
-//         {/* Tone selection */}
 //         <div>
 //           <label htmlFor="tone">Tone:</label>
 //           <select
@@ -137,48 +225,18 @@
 //           </select>
 //         </div>
 
-//         {/* Updated Model Selection */}
 //         <div className="model-selection" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-//           <div className="model-group">
-//             <label>
+//           {models.map((model) => (
+//             <label key={model}>
 //               <input
 //                 type="checkbox"
-//                 value={models[0]}
-//                 checked={formData.models.includes(models[0])}
+//                 value={model}
+//                 checked={formData.models.includes(model)}
 //                 onChange={handleModelChange}
 //               />
-//               {models[0]}
+//               {model}
 //             </label>
-//             <label>
-//               <input
-//                 type="checkbox"
-//                 value={models[1]}
-//                 checked={formData.models.includes(models[1])}
-//                 onChange={handleModelChange}
-//               />
-//               {models[1]}
-//             </label>
-//           </div>
-//           <div className="model-group">
-//             <label>
-//               <input
-//                 type="checkbox"
-//                 value={models[2]}
-//                 checked={formData.models.includes(models[2])}
-//                 onChange={handleModelChange}
-//               />
-//               {models[2]}
-//             </label>
-//             <label>
-//               <input
-//                 type="checkbox"
-//                 value={models[3]}
-//                 checked={formData.models.includes(models[3])}
-//                 onChange={handleModelChange}
-//               />
-//               {models[3]}
-//             </label>
-//           </div>
+//           ))}
 //         </div>
 
 //         {error && <div className="error">{error}</div>}
@@ -217,12 +275,13 @@
 
 // export default CompareTranslate;
 
+
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { createClient } from "@supabase/supabase-js";
 import { Configuration, OpenAIApi } from "openai";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { BeatLoader } from "react-spinners";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
@@ -233,7 +292,7 @@ const CompareTranslate = () => {
     message: "",
     toLanguage: "Spanish",
     models: [],
-    tone: "mild", // Default tone
+    tone: "mild",
   });
   const [translations, setTranslations] = useState({});
   const [scores, setScores] = useState({});
@@ -247,27 +306,16 @@ const CompareTranslate = () => {
   const openai = new OpenAIApi(configuration);
 
   const deepLLanguageCodes = {
-    "Spanish": "ES",
-    "French": "FR",
-    "German": "DE",
-    "Italian": "IT",
-    "Dutch": "NL",
-    "Russian": "RU",
+    Spanish: "ES",
+    French: "FR",
+    German: "DE",
+    Italian: "IT",
+    Dutch: "NL",
+    Russian: "RU",
     "Chinese (Simplified)": "ZH",
-    "Japanese": "JA",
-    "Portuguese": "PT",
-    "Polish": "PL",
-    "Swedish": "SV",
-    "Arabic": "AR",
-    "Turkish": "TR",
-    "Korean": "KO",
-    "Hindi": "HI",
-    "Greek": "EL",
-    "Hebrew": "HE",
-    "Thai": "TH",
-    "Vietnamese": "VI",
-    "Indonesian": "ID",
-    "Malay": "MS",
+    Japanese: "JA",
+    Portuguese: "PT",
+    Polish: "PL",
   };
 
   const handleInputChange = (e) => {
@@ -281,7 +329,6 @@ const CompareTranslate = () => {
       const models = prevState.models.includes(model)
         ? prevState.models.filter((m) => m !== model)
         : [...prevState.models, model];
-      
       return { ...prevState, models };
     });
   };
@@ -289,32 +336,24 @@ const CompareTranslate = () => {
   const translateWithDeepL = async (text, toLang) => {
     try {
       const targetLangCode = deepLLanguageCodes[toLang];
-      if (!targetLangCode) {
-        throw new Error(`Unsupported language: ${toLang}`);
-      }
-
       const response = await fetch(`https://api-free.deepl.com/v2/translate`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: new URLSearchParams({
           auth_key: import.meta.env.VITE_DEEPL_API_KEY,
-          text: text,
+          text,
           source_lang: "EN",
           target_lang: targetLangCode,
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`DeepL API request failed with status ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`DeepL API request failed`);
 
       const data = await response.json();
       return data.translations[0].text;
     } catch (error) {
       console.error("DeepL Translation Error:", error);
-      throw new Error("Failed to translate with DeepL. Please check the API key, language codes, or try again later.");
+      throw new Error("Failed to translate with DeepL.");
     }
   };
 
@@ -326,9 +365,9 @@ const CompareTranslate = () => {
     try {
       if (model.startsWith("gpt")) {
         const response = await openai.createChatCompletion({
-          model: model,
+          model,
           messages: [
-            { role: "system", content: `Translate this sentence into ${toLanguage}.` },
+            { role: "system", content: `Translate this sentence into ${toLanguage}. `},
             { role: "user", content: message },
           ],
           max_tokens: 100,
@@ -342,13 +381,33 @@ const CompareTranslate = () => {
       } else if (model === "deepl") {
         translatedText = await translateWithDeepL(message, toLanguage);
       }
-
       return translatedText;
     } catch (error) {
       console.error("Translation Error:", error);
       setError("Translation failed. Please try again.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const saveComparison = async (originalMessage, translation, model, score) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/compare_translations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          original_message: originalMessage,
+          translated_message: translation,
+          translation_model: model,
+          score,
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to save comparison");
+      const data = await response.json();
+      console.log("Comparison saved:", data);
+    } catch (error) {
+      console.error("Error saving comparison:", error);
     }
   };
 
@@ -367,13 +426,14 @@ const CompareTranslate = () => {
       const promises = formData.models.map(async (model) => {
         const translation = await translate(model);
         const score = Math.floor(Math.random() * 10) + 1;
+        saveComparison(formData.message, translation, model, score);
         return { model, translation, score };
       });
 
       const results = await Promise.all(promises);
       const translationResults = {};
       const scoreResults = {};
-      
+
       results.forEach(({ model, translation, score }) => {
         translationResults[model] = translation;
         scoreResults[model] = score;
@@ -444,7 +504,7 @@ const CompareTranslate = () => {
           </select>
         </div>
 
-        <div className="model-selection" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+        <div className="model-selection">
           {models.map((model) => (
             <label key={model}>
               <input
@@ -473,7 +533,7 @@ const CompareTranslate = () => {
               <tr>
                 <th>Model</th>
                 <th>Translation</th>
-                <th>Average Score</th>
+                <th>Score</th>
               </tr>
             </thead>
             <tbody>
